@@ -1,13 +1,10 @@
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
 
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-
-app.use(cors());
 
 const io = new Server(server, {
   cors: {
@@ -17,6 +14,15 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log(`user ${socket.id} just connected`);
+
+  socket.on("sender", (data) => {
+    console.log(data);
+    io.emit("receiver", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("user disconnect");
+  });
 });
 
 const PORT = process.env.PORT || 8000;
